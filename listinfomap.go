@@ -95,9 +95,12 @@ func (lm *ListInfoMap) FlattenAndGenUniqueDomainList() error {
 
 // ToProto generates a router.GeoSite for each file in data directory
 // and returns a router.GeoSiteList
-func (lm *ListInfoMap) ToProto(excludeAttrs map[fileName]map[attribute]bool) *router.GeoSiteList {
+func (lm *ListInfoMap) ToProto(excludeAttrs map[fileName]map[attribute]bool, allowLists map[fileName]bool) *router.GeoSiteList {
 	protoList := new(router.GeoSiteList)
-	for _, listinfo := range *lm {
+	for name, listinfo := range *lm {
+		if !allowLists[name] { // 仅处理允许的列表
+			continue
+		}
 		listinfo.ToGeoSite(excludeAttrs)
 		protoList.Entry = append(protoList.Entry, listinfo.GeoSite)
 	}
